@@ -19,3 +19,6 @@ if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
 
 # procfile: web: uvicorn main:app --host 0.0.0.0 --port 8080
+# curl -X GET "https://fastapi-app-133427381338.asia-south1.run.app" \
+# -H "Authorization: bearer $(gcloud auth print-identity-token)" \
+# -H "Content-Type: application/json"
