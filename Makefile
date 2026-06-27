@@ -84,6 +84,20 @@ destroy-all: check-project
 	
 	@echo "--> Clean up complete. All remote cloud resources have been removed."
 
+# Automates setting up the keys required for Step 1
+setup-github-sa: check-project
+	@echo "--> Creating GitHub Service Account and generating deployment key..."
+	gcloud iam service-accounts create github-deployer --display-name="GitHub Actions Deployer" || true
+	gcloud projects add-iam-policy-binding $(PROJECT_ID) \
+		--member="serviceAccount:github-deployer@$(PROJECT_ID).iam.gserviceaccount.com" \
+		--role="roles/cloudbuild.builds.editor" --quiet
+	gcloud iam service-accounts keys create gcp-key.json \
+		--iam-account=github-deployer@$(PROJECT_ID).iam.gserviceaccount.com
+	@echo "======================================================================="
+	@echo " SUCCESS: Copy the string inside 'gcp-key.json' to GitHub Secrets!"
+	@echo "======================================================================="
+
+
 clean:
 	@echo "--> Purging temporary local environment cache structures..."
 	find . -type d -name "__pycache__" -exec rm -rf {} +

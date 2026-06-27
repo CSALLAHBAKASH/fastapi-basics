@@ -1,0 +1,32 @@
+name: Deploy FastAPI to Cloud Run
+
+on:
+  push:
+    branches:
+      - main # Triggers the pipeline automatically when you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the code from GitHub
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Step 2: Authenticate securely with Google Cloud
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    # Step 3: Set up Cloud SDK tools on the GitHub runner
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    # Step 4: Run your exact cloudbuild.yaml workflow file
+    - name: Trigger Cloud Build
+      run: |
+        gcloud builds submit --config cloudbuild.yaml
