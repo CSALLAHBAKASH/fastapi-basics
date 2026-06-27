@@ -13,7 +13,7 @@ steps:
       - 'push'
       - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-fastapi-repo/fastapi-app:latest'
 
-  # Step 3: Deploy the image to Cloud Run (Explicitly targeting port 8080)
+  # Step 3: Deploy to Cloud Run (Allow unauthenticated traffic cleanly here)
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
@@ -23,17 +23,6 @@ steps:
       - '--region=asia-south1'
       - '--port=8080'
       - '--allow-unauthenticated'
-
-  # Step 4: Force public IAM visibility to fix the warning
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args:
-      - 'run'
-      - 'services'
-      - 'add-iam-policy-binding'
-      - 'fastapi-app'
-      - '--region=asia-south1'
-      - '--member=allUsers'
-      - '--role=roles/run.invoker'
 
 images:
   - 'asia-south1-docker.pkg.dev/$PROJECT_ID/my-fastapi-repo/fastapi-app:latest'
