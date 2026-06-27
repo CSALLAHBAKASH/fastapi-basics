@@ -9,6 +9,10 @@ app = FastAPI()
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/heathz")
+def health_check():
+    return {"status": "ok"}
+
 if __name__ == "__main__":
     # Look for Cloud Run's default port, fallback to 8080
     port = int(os.environ.get("PORT", 8080))
