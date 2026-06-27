@@ -112,7 +112,24 @@ destroy-all: check-project
 	@echo "--> Clean up complete. All remote cloud resources have been removed."
 
 # Step 7: Clear out code tracking caches
+# Enhanced to clean local folders and securely wipe remote GitHub Secrets
 clean:
 	@echo "--> Purging temporary local environment cache structures..."
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	find . -type d -name "__pycache__" -exec rm -rf {} + || true
+	find . -type d -name ".pytest_cache" -exec rm -rf {} + || true
+	
+	@echo "--> Erasing sensitive local GCP credential key files..."
+	@if [ -f gcp-key.json ]; then \
+		rm -f gcp-key.json && echo "Successfully removed local gcp-key.json"; \
+	else \
+		echo "No local gcp-key.json found to remove."; \
+	fi
+	
+	@echo "--> Deleting secrets from GitHub repository vault..."
+	@if command -v gh >/dev/null 2>&1; then \
+		echo "GitHub CLI detected. Purging repository secrets..."; \
+		gh secret delete GCP_PROJECT_ID || echo "Could not delete GCP_PROJECT_ID (Check if it exists)"; \
+		gh secret delete GCP_SA_KEY || echo "Could not delete GCP_SA_KEY (Check if it exists)"; \
+	else \
+		echo "WARNING: GitHub CLI (gh) not installed or authenticated. Skipping remote secret deletion."; \
+	fi
