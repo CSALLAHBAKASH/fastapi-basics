@@ -3,7 +3,7 @@ name: Deploy FastAPI to Cloud Run
 on:
   push:
     branches:
-      - main # Triggers the pipeline automatically when you push to main
+      - master # Triggers the pipeline automatically when you push to main
 
 jobs:
   deploy:
