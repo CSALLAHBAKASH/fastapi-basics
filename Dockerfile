@@ -1,19 +1,13 @@
-FROM python:3.13-slim
-
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+FROM  python:3.13-slim
 
 WORKDIR /app
 
-# Copy dependency files first (for layer caching)
-COPY pyproject.toml uv.lock ./
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies using the lockfile (no venv, system Python)
-RUN uv sync --frozen --no-dev --no-install-project
-
-# Copy the rest of the project
 COPY . .
 
 EXPOSE 8000
 
-CMD ["uv", "run", "fastapi", "dev", "main.py", "--host", "0.0.0.0"]
+CMD ["uv","run","uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
